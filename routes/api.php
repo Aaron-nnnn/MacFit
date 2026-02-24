@@ -5,11 +5,13 @@ use App\Http\Controllers\BundleController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\EquipmentController;
 use App\Http\Controllers\GymController;
+use App\Http\Controllers\ResendEmailVerificationController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SubscriptionController;
+use App\Http\Controllers\VerifyEmailController;
 use App\Models\Bundle;
 use App\Models\Gym;
 use App\Models\Subscription;
@@ -17,6 +19,14 @@ use App\Models\Subscription;
 // Public Routes
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+
+//Email Verification
+Route::get('/email/verify/{id}/{hash}', [VerifyEmailController::class, 'verify'])
+    ->name('verification.verify')
+    ->middleware(['signed', 'throttle:6,1']);
+
+Route::post('/email/resend', [ResendEmailVerificationController::class, 'resend'])
+    ->middleware('throttle:6,1');
 
 // Protected Routes
 Route::middleware('auth:sanctum')->group(function () {

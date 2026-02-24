@@ -55,10 +55,10 @@ class User extends Authenticatable
 
     public function abilities(){
         return [
-            'admin' => $this->role ===1,
-            'trainer' => $this->role === 2,
-            'user' => $this->role === 3,
-            'staff' => $this->role === 4,
+            'admin' => $this->role->id ===1,
+            'trainer' => $this->role->id === 2,
+            'user' => $this->role->id === 3,
+            'staff' => $this->role->id === 4,
         ];
     }
 }
