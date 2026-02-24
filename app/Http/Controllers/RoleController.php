@@ -25,7 +25,7 @@ class RoleController extends Controller
             return response()->json([
                 'error'=>'Failed to Save Role',
                 'message'=>$exception->getMessage()
-            ]);
+            ],200);
         }
     }
 
@@ -38,7 +38,7 @@ class RoleController extends Controller
             return response()->json([
                'error'=>'Failed to fetch Roles.',
                'message'=>$exception->getMessage() 
-            ]);
+            ], 200);
         }
     }
 
@@ -51,7 +51,7 @@ class RoleController extends Controller
             return response()->json([
                 'error'=>'Failed to fetch the role.',
                 'message'=>$exception->getMessage()
-            ]);
+            ], 200);
         }
     }
 
