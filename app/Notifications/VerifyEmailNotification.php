@@ -40,7 +40,7 @@ class VerifyEmailNotification extends Notification
             ->subject('Verify Your Email Address.')
             ->line('Click the button bellow to verify your email address.')
             ->action('Verify Email', $this->signedUrl)
-            ->line('If you did not create an account then, nom action is required');
+            ->line('If you did not create an account then, no further action is required.');
     }
 
     /**

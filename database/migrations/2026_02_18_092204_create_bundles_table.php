@@ -18,6 +18,7 @@ return new class extends Migration
             $table->time('duration');
             $table->string('description', 1000);
             $table->unsignedBigInteger('category_id');
+            $table->double('value');
 
             $table->foreign('category_id')->references('id')->on('categories');
 
