@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SubscriptionController;
+use App\Http\Controllers\UserOtpController;
 use App\Http\Controllers\VerifyEmailController;
 use App\Models\Bundle;
 use App\Models\Gym;
@@ -19,6 +20,8 @@ use App\Models\Subscription;
 // Public Routes
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+Route::get('/getRoles', [RoleController::class, 'readAllRoles']);
+Route::post('/verify-otp', [UserOtpController::class, 'verifyOtp']);
 
 //Email Verification
 Route::get('/email/verify/{id}/{hash}', [VerifyEmailController::class, 'verify'])
@@ -34,7 +37,6 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::post('/logout', [AuthController::class, 'logout']);
 
 Route::post('/saveRole', [RoleController::class, 'createRole']);
-Route::get('/getRoles', [RoleController::class, 'readAllRoles']);
 Route::get('/getRole/{id}', [RoleController::class, 'readRole']);
 Route::post('/updateRole/{id}', [RoleController::class, 'updateRole']);
 Route::delete('/deleteRole/{id}', [RoleController::class, 'deleteRole']);

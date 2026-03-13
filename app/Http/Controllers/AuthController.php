@@ -2,13 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Controller;
+use App\Mail\OtpMail;
 use App\Models\Role;
 use App\Models\User;
+use App\Models\UserOtp;
 use App\Notifications\VerifyEmailNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\URL;
-use Illuminate\Validation\ValidationException;
+use illuminate\Validation\ValidationException;
+use Illuminate\Validation\ValidationException as ValidationValidationException;
 
 class AuthController extends Controller
 {
@@ -16,9 +21,12 @@ class AuthController extends Controller
         $validated = $request->validate([
             'name'=>'required|string|max:40',
             'email'=>'required|email|unique:users,email',
-            'password'=>'required|string|min:4|max:15|confirmed',
+            'password'=>'required|string|min:4|max:15',
             'user_image'=>'nullable|image|mimes:jpeg,png,jpg'
+
         ]);
+
+        $role = Role::where('name', 'User')->first();
 
          if($request->role_id){
             $role_id = $request->role_id;
@@ -32,72 +40,99 @@ class AuthController extends Controller
         $user->email = $validated['email'];
         $user->role_id = $role_id;
         $user->password = Hash::make($validated['password']);
+        $user->is_active = true; //to delete later
 
         if($request->hasFile('user_image')){
             $filename = $request->file('user_image')->store('users', 'public');
         } else{
             $filename = null;
         }
-         $user->user_image = $filename;
-
+             $user->user_image = $filename;
         try{
             $user->save();
 
-             $signedUrl = URL::temporarySignedRoute(
-            'verification.verify',
-            now()->addMinutes(60),
-            [
-                'id'=>$user->id,
-                'hash'=>sha1($user->email)
-            ]
-        );
+        //      $signedUrl = URL::temporarySignedRoute(
+        //     'verification.verify',
+        //     now()->addMinutes(60),
+        //     [
+        //         'id'=>$user->id,
+        //         'hash'=>sha1($user->email)
+        //     ]
+        // );
 
-        $user->notify(new VerifyEmailNotification($signedUrl));
-        return response()->json([
-            'message'=>'Verification Email resent successfully.'
-        ], 200);
-        
-            return response()->json($user);
+        // $user->notify(new VerifyEmailNotification($signedUrl));
+
+        // return response()->json([
+        //     'message'=>'Verification Email resent successfuly.'
+        // ], 200);
+
+           $token = $user->createToken('auth-token')->plainTextToken;
+            return response()->json([
+                'message'=>'Registration Successful!',
+                'user'=>$user,
+                'token'=>$token,
+            ], 201);
         }
+
         catch(\Exception $exception){
-             return response()->json([
-                'error'=>"Registration Failed!",
+            return response()->json([
+                'error'=>"Registration failed",
                 'message'=>$exception->getMessage()
             ]);
         }
-
     }
 
     public function login(Request $request){
          $validated = $request->validate([
-             'email'=>'required|email',
-             'password'=>'required|string|min:4',
+            'email'=>'required|email',
+            'password'=>'required|string|min:4|max:15'
         ]);
 
-         $user = User::where('email', $validated['email'])->first();
+        $user = User::where('email', $validated['email'])->first();
 
-             if(!$user || !Hash::check($validated['password'], $user->password))
-             throw ValidationException::withMessages([
-                 'error'=>'Invalid Credentials'], 401);
+        if(!$user || !Hash::check($validated['password'], $user->password)){
 
-        if(!$user->is_active){
+            throw ValidationException::withMessages([
+                'error'=>'Invalid Credentials'
+            ], 401);
+        }
+                if(!$user->is_active){
+                    return response()->json([
+                        'message'=>'Your account is not active.Please verify your Email Address'
+                    ], 403);
+                }
+
+            // $otp = rand(100000, 999999);
+            // $expiresAt = now()->addMinutes(5);
+
+            // UserOtp::updateOrCreate([
+            //     'user_id'=>$user->id,
+            //     'otp'=>$otp,
+            //     'expires_at'=>$expiresAt
+            // ]);
+
+            // Mail::to($user->email)->send(new OtpMail($otp));
+
+            
+            // return response()->json([
+            //     'message'=>'OTP sent to your email. Please verify to complete login',
+            //  ], 201);
+
+            $token = $user->createToken('auth-token')->plainTextToken;
             return response()->json([
-                'message'=>'Your account is not active please verify your email address'
-            ], 403);
-        }         
-    
-         $token = $user->createToken("auth-token")->plainTextToken;
-
-             return response()->json([
-            'message'=>'Login Successful!',
-            'token'=>$token,
-            'user'=>$user,
-            'abilities'=>$user->abilities(),
-         ], 201);
+                'message'=>'Registration Successful!',
+                'user'=>$user,
+                'token'=>$token,
+            ], 201);
     }
 
     public function logout(Request $request){
         $request->user()->currentAccessToken()->delete();
-        return response()->json('Log out Successful');
+        return response()->json('Logout Successful.');
     }
+
+    public function userInfo(){
+        return response()->json(auth()->user);
+    }
+  
 }
