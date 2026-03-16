@@ -12,7 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\URL;
-use illuminate\Validation\ValidationException;
+use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\ValidationException as ValidationValidationException;
 
 class AuthController extends Controller
@@ -22,24 +22,33 @@ class AuthController extends Controller
             'name'=>'required|string|max:40',
             'email'=>'required|email|unique:users,email',
             'password'=>'required|string|min:4|max:15',
-            'user_image'=>'nullable|image|mimes:jpeg,png,jpg'
-
+            'user_image'=>'nullable|image|mimes:jpeg,png,jpg',
+            'role_id'=>'required|integer',
+            'phoneNumber'=>'nullable|string',
+            'gender'=>'nullable|string',
+            'dob'=>'nullable|string',
+            'gymLocation'=>'nullable|string'
+            
         ]);
 
-        $role = Role::where('name', 'User')->first();
+        // $role = Role::where('name', 'User')->first();
 
-         if($request->role_id){
-            $role_id = $request->role_id;
-        } else{
-            $role = Role::where('name', 'User')->first();
-            $role_id = $role->id;
-        }
+        //  if($request->role_id){
+        //     $role_id = $request->role_id;
+        // } else{
+        //     $role = Role::where('name', 'User')->first();
+        //     $role_id = $role->id;
+        // }
 
         $user = new User();
         $user->name = $validated['name'];
         $user->email = $validated['email'];
-        $user->role_id = $role_id;
+        $user->role_id = $validated['role_id'];
         $user->password = Hash::make($validated['password']);
+        $user->phoneNumber = $validated['phoneNumber'];
+        $user->gender = $validated['gender'];
+        $user->dob = $validated['dob'];
+        $user->gymLocations = $validated['gymLocation'];
         $user->is_active = true; //to delete later
 
         if($request->hasFile('user_image')){
