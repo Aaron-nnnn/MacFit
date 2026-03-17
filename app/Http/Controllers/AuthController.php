@@ -48,7 +48,7 @@ class AuthController extends Controller
         $user->phoneNumber = $validated['phoneNumber'];
         $user->gender = $validated['gender'];
         $user->dob = $validated['dob'];
-        $user->gymLocations = $validated['gymLocation'];
+        $user->gymLocation = $validated['gymLocation'];
         $user->is_active = true; //to delete later
 
         if($request->hasFile('user_image')){

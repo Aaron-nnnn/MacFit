@@ -13,6 +13,7 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\UserOtpController;
 use App\Http\Controllers\VerifyEmailController;
+use App\Http\Controllers\UserController;
 use App\Models\Bundle;
 use App\Models\Gym;
 use App\Models\Subscription;
@@ -70,5 +71,7 @@ Route::get('/getEquipments', [EquipmentController::class, 'readAllEquipments']);
 Route::get('/getEquipment/{id}', [EquipmentController::class, 'readEquipment']);
 Route::post('/updateEquipment/{id}', [EquipmentController::class, 'updateEquipment']);
 Route::delete('/deleteEquipment/{id}', [EquipmentController::class, 'deleteEquipment']);
+
+Route::resource('users', UserController::class);
 
 });
