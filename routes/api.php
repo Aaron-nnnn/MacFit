@@ -21,7 +21,7 @@ use App\Models\Subscription;
 // Public Routes
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
-Route::get('/getRoles', [RoleController::class, 'readAllRoles']);
+
 Route::post('/verify-otp', [UserOtpController::class, 'verifyOtp']);
 
 //Email Verification
@@ -37,6 +37,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
 Route::post('/logout', [AuthController::class, 'logout']);
 
+Route::get('/getRoles', [RoleController::class, 'readAllRoles']);
 Route::post('/saveRole', [RoleController::class, 'createRole']);
 Route::get('/getRole/{id}', [RoleController::class, 'readRole']);
 Route::post('/updateRole/{id}', [RoleController::class, 'updateRole']);
